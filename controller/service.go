@@ -25,6 +25,8 @@ func ServiceRegister(router *gin.RouterGroup) {
 	router.POST("/service_add_http", service.ServiceAddHTTP)
 	router.POST("/service_update_http", service.ServiceUpdateHTTP)
 	router.POST("/service_add_tcp", service.ServiceAddTcp)
+	router.POST("/service_update_tcp", service.ServiceUpdateTcp)
+
 }
 
 // ServiceList godoc
@@ -520,6 +522,96 @@ func (admin *ServiceController) ServiceAddTcp(c *gin.Context) {
 	if err := accessControl.Save(c, tx); err != nil {
 		tx.Rollback()
 		middleware.ResponseError(c, 2009, err)
+		return
+	}
+	tx.Commit()
+	middleware.ResponseSuccess(c, "")
+	return
+}
+
+// ServiceUpdateTcp godoc
+// @Summary tcp服务更新
+// @Description tcp服务更新
+// @Tags 服务管理
+// @ID /service/service_update_tcp
+// @Accept  json
+// @Produce  json
+// @Param body body dto.ServiceUpdateTcpInput true "body"
+// @Success 200 {object} middleware.Response{data=string} "success"
+// @Router /service/service_update_tcp [post]
+func (admin *ServiceController) ServiceUpdateTcp(c *gin.Context) {
+	params := &dto.ServiceUpdateTcpInput{}
+	if err := params.GetValidParams(c); err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+
+	//ip与权重数量一致
+	if len(strings.Split(params.IpList, ",")) != len(strings.Split(params.WeightList, ",")) {
+		middleware.ResponseError(c, 2002, errors.New("ip列表与权重设置不匹配"))
+		return
+	}
+
+	tx := lib.GORMDefaultPool.Begin()
+
+	service := &dao.ServiceInfo{
+		ID: params.ID,
+	}
+	detail, err := service.ServiceDetail(c, lib.GORMDefaultPool, service)
+	if err != nil {
+		middleware.ResponseError(c, 2002, err)
+		return
+	}
+
+	info := detail.Info
+	info.ServiceDesc = params.ServiceDesc
+	if err := info.Save(c, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2003, err)
+		return
+	}
+
+	loadBalance := &dao.LoadBalance{}
+	if detail.LoadBalance != nil {
+		loadBalance = detail.LoadBalance
+	}
+	loadBalance.ServiceID = info.ID
+	loadBalance.RoundType = params.RoundType
+	loadBalance.IpList = params.IpList
+	loadBalance.WeightList = params.WeightList
+	loadBalance.ForbidList = params.ForbidList
+	if err := loadBalance.Save(c, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2004, err)
+		return
+	}
+
+	tcpRule := &dao.TcpRule{}
+	if detail.TCPRule != nil {
+		tcpRule = detail.TCPRule
+	}
+	tcpRule.ServiceID = info.ID
+	tcpRule.Port = params.Port
+	if err := tcpRule.Save(c, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2005, err)
+		return
+	}
+
+	accessControl := &dao.AccessControl{}
+	if detail.AccessControl != nil {
+		accessControl = detail.AccessControl
+	}
+	accessControl.ServiceID = info.ID
+	accessControl.OpenAuth = params.OpenAuth
+	accessControl.BlackList = params.BlackList
+	accessControl.WhiteList = params.WhiteList
+	accessControl.WhiteHostName = params.WhiteHostName
+	accessControl.ClientIPFlowLimit = params.ClientIPFlowLimit
+	accessControl.ServiceFlowLimit = params.ServiceFlowLimit
+	if err := accessControl.Save(c, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2006, err)
 		return
 	}
 	tx.Commit()
