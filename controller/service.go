@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/CoderTH/go_gateway/dao"
 	"github.com/CoderTH/go_gateway/dto"
@@ -19,6 +20,7 @@ func ServiceRegister(router *gin.RouterGroup) {
 	service := ServiceController{}
 	router.GET("/service_list", service.ServiceList)
 	router.GET("/service_delete", service.ServiceDelete)
+	router.GET("/service_stat", service.ServiceStat)
 	router.GET("/service_detail", service.ServiceDetail)
 	router.POST("/service_add_http", service.ServiceAddHTTP)
 	router.POST("/service_update_http", service.ServiceUpdateHTTP)
@@ -376,4 +378,48 @@ func (service *ServiceController) ServiceDetail(c *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(c, serviceDetail)
+}
+
+// ServiceStat godoc
+// @Summary 服务统计
+// @Description 服务统计
+// @Tags 服务管理
+// @ID /service/service_stat
+// @Accept  json
+// @Produce  json
+// @Param id query string true "服务ID"
+// @Success 200 {object} middleware.Response{data=dto.ServiceStatOutput} "success"
+// @Router /service/service_stat [get]
+func (service *ServiceController) ServiceStat(c *gin.Context) {
+	params := &dto.ServiceDeleteInput{}
+	if err := params.BindValidParam(c); err != nil {
+		middleware.ResponseError(c, 2000, err)
+		return
+	}
+
+	//读取基本信息
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+	serviceInfo := &dao.ServiceInfo{ID: params.ID}
+	_, err = serviceInfo.ServiceDetail(c, tx, serviceInfo)
+	if err != nil {
+		middleware.ResponseError(c, 2003, err)
+		return
+	}
+
+	todayList := []int64{}
+	for i := 0; i < time.Now().Hour(); i++ {
+		todayList = append(todayList, 0)
+	}
+	yesterdayList := []int64{}
+	for i := 0; i < 23; i++ {
+		yesterdayList = append(yesterdayList, 0)
+	}
+	middleware.ResponseSuccess(c, &dto.ServiceStatOutput{
+		Today:     todayList,
+		Yesterday: yesterdayList,
+	})
 }
