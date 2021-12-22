@@ -14,13 +14,13 @@ import (
 
 //APPControllerRegister admin路由注册
 func APPRegister(router *gin.RouterGroup) {
-	admin := APPController{}
-	router.GET("/app_list", admin.APPList)
-	router.GET("/app_detail", admin.APPDetail)
-	router.GET("/app_stat", admin.AppStatistics)
-	router.GET("/app_delete", admin.APPDelete)
-	router.POST("/app_add", admin.AppAdd)
-	router.POST("/app_update", admin.AppUpdate)
+	app := APPController{}
+	router.GET("/app_list", app.APPList)
+	router.GET("/app_detail", app.APPDetail)
+	router.GET("/app_stat", app.AppStatistics)
+	router.GET("/app_delete", app.APPDelete)
+	router.POST("/app_add", app.AppAdd)
+	router.POST("/app_update", app.AppUpdate)
 }
 
 type APPController struct {

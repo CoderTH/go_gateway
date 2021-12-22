@@ -44,7 +44,7 @@ func (adminlogin *AdminController) AdminInfo(c *gin.Context) {
 		ID:           adminSessionInfo.ID,
 		Name:         adminSessionInfo.UserName,
 		LoginTime:    adminSessionInfo.LoginTime,
-		Avatar:       "https://www.google.com/imgres?imgurl=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fe%2Fe8%2FCandymyloveYasu.png%2F220px-CandymyloveYasu.png&imgrefurl=https%3A%2F%2Fzh.wikipedia.org%2Fwiki%2F%25E5%25A4%25B4%25E5%2583%258F&tbnid=lLmpObEzLEyh_M&vet=12ahUKEwjd3qyA8-_0AhWF0IsBHUjWD60QMygAegUIARCaAQ..i&docid=ryEBP9pMcfMEoM&w=220&h=220&itg=1&q=touxiang&ved=2ahUKEwjd3qyA8-_0AhWF0IsBHUjWD60QMygAegUIARCaAQ",
+		Avatar:       "https://upload.wikimedia.org/wikipedia/commons/e/e8/CandymyloveYasu.png",
 		Introduction: "I am a super administrator",
 		Roles:        []string{"admin"},
 	}
