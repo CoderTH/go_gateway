@@ -22,3 +22,11 @@ const (
 	JwtSignKey = "my_sign_key"
 	JwtExpires = 60 * 60
 )
+
+var (
+	LoadTypeMap = map[int]string{
+		LoadTypeHTTP: "HTTP",
+		LoadTypeTCP:  "TCP",
+		LoadTypeGRPC: "GRPC",
+	}
+)
