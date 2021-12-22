@@ -2,11 +2,12 @@ package router
 
 import (
 	"context"
-	"github.com/e421083458/golang_common/lib"
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/e421083458/golang_common/lib"
+	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -24,8 +25,8 @@ func HttpServerRun() {
 		MaxHeaderBytes: 1 << uint(lib.GetIntConf("base.http.max_header_bytes")),
 	}
 	go func() {
-		log.Printf(" [INFO] HttpServerRun:%s\n",lib.GetStringConf("base.http.addr"))
-		if err := HttpSrvHandler.ListenAndServe(); err != nil {
+		log.Printf(" [INFO] HttpServerRun:%s\n", lib.GetStringConf("base.http.addr"))
+		if err := HttpSrvHandler.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf(" [ERROR] HttpServerRun:%s err:%v\n", lib.GetStringConf("base.http.addr"), err)
 		}
 	}()
