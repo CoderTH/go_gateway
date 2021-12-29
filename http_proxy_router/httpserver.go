@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	HttpSrvHandler *http.Server
+	HttpSrvHandler  *http.Server
 	HttpsSrvHandler *http.Server
 )
 
@@ -41,7 +41,6 @@ func HttpServerStop() {
 	log.Printf(" [INFO] http_proxy_Stop stopped\n")
 }
 
-
 func HttpsServerRun() {
 	gin.SetMode(lib.GetStringConf("proxy_base_debug_mode"))
 	r := InitRouter()
@@ -53,7 +52,7 @@ func HttpsServerRun() {
 		MaxHeaderBytes: 1 << uint(lib.GetIntConf("proxy.https.max_header_bytes")),
 	}
 	log.Printf(" [INFO] https_proxy_run :%s\n", lib.GetStringConf("proxy.https.addr"))
-	if err := HttpsSrvHandler.ListenAndServeTLS(cert_file.Path("server.crt"),cert_file.Path("server.key")); err != nil && err != http.ErrServerClosed {
+	if err := HttpsSrvHandler.ListenAndServeTLS(cert_file.Path("server.crt"), cert_file.Path("server.key")); err != nil && err != http.ErrServerClosed {
 		log.Fatalf(" [ERROR] https_proxy_run:%s err:%v\n", lib.GetStringConf("proxy.https.addr"), err)
 	}
 }
