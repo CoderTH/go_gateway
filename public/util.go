@@ -29,3 +29,12 @@ func ObjToJson(s interface{}) string {
 	marshal, _ := json.Marshal(s)
 	return string(marshal)
 }
+
+func InStringSlice(slice []string, str string) bool {
+	for _, item := range slice {
+		if str == item {
+			return true
+		}
+	}
+	return false
+}
