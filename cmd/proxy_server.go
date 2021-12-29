@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/CoderTH/go_gateway/dao"
 	"github.com/CoderTH/go_gateway/http_proxy_router"
 	"os"
 	"os/signal"
@@ -12,6 +13,7 @@ import (
 func main() {
 	lib.InitModule("./conf/dev/", []string{"base", "mysql", "redis"})
 	defer lib.Destroy()
+	dao.ServiceManagerHandler.LoadOnce()
 	go func() {
 		http_proxy_router.HttpServerRun()
 	}()

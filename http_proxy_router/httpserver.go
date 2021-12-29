@@ -3,6 +3,7 @@ package http_proxy_router
 import (
 	"context"
 	"github.com/CoderTH/go_gateway/cert_file"
+	"github.com/CoderTH/go_gateway/middleware"
 	"log"
 	"net/http"
 	"time"
@@ -18,7 +19,7 @@ var (
 
 func HttpServerRun() {
 	gin.SetMode(lib.GetStringConf("proxy_base_debug_mode"))
-	r := InitRouter()
+	r := InitRouter(middleware.RecoveryMiddleware(),middleware.RequestLog())
 	HttpSrvHandler = &http.Server{
 		Addr:           lib.GetStringConf("proxy.http.addr"),
 		Handler:        r,
@@ -43,7 +44,7 @@ func HttpServerStop() {
 
 func HttpsServerRun() {
 	gin.SetMode(lib.GetStringConf("proxy_base_debug_mode"))
-	r := InitRouter()
+	r := InitRouter(middleware.RecoveryMiddleware(),middleware.RequestLog())
 	HttpsSrvHandler = &http.Server{
 		Addr:           lib.GetStringConf("proxy.https.addr"),
 		Handler:        r,

@@ -3,6 +3,7 @@ package public
 import (
 	"crypto/md5"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"io"
 )
@@ -22,4 +23,9 @@ func MD5(s string) string {
 	h := md5.New()
 	io.WriteString(h, s)
 	return fmt.Sprintf("%x", h.Sum(nil))
+}
+
+func ObjToJson(s interface{}) string {
+	marshal, _ := json.Marshal(s)
+	return string(marshal)
 }
