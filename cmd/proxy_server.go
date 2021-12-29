@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"github.com/CoderTH/go_gateway/http_proxy_router"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,8 +12,15 @@ import (
 func main() {
 	lib.InitModule("./conf/dev/", []string{"base", "mysql", "redis"})
 	defer lib.Destroy()
-	fmt.Println("start proxy server")
+	go func() {
+		http_proxy_router.HttpServerRun()
+	}()
+	go func() {
+		http_proxy_router.HttpsServerRun()
+	}()
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGKILL, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
+	http_proxy_router.HttpServerStop()
+	http_proxy_router.HttpsServerStop()
 }
